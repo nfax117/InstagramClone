@@ -12,10 +12,13 @@ private let reuseIdentifier = "Cell" // Helps with queueing/dequeueing cells in 
 
 class FeedController: UICollectionViewController {
     // MARK: - Lifecycle
+    
+    private var posts = [Post]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        fetchPosts()
     }
     
     // MARK: - Actions
@@ -30,6 +33,15 @@ class FeedController: UICollectionViewController {
             self.present(nav, animated: true, completion: nil)
         } catch {
             print("DEBUG: Failed to sign out")
+        }
+    }
+    
+    // MARK: - API
+    
+    func fetchPosts() {
+        PostService.fetchPosts { posts in
+            self.posts = posts
+            self.collectionView.reloadData()
         }
     }
 
@@ -53,12 +65,13 @@ class FeedController: UICollectionViewController {
 extension FeedController {
     /// Tells collection view how many cells to create
     override func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
-        return 10
+        return posts.count
     }
 
     /// Tells collection view how to create each cell
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! FeedCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! FeedCell
+        return cell
     }
 }
 
