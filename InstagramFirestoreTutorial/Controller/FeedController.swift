@@ -14,6 +14,8 @@ class FeedController: UICollectionViewController {
     // MARK: - Lifecycle
     
     private var posts = [Post]()
+    
+    var post: Post?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,6 +46,8 @@ class FeedController: UICollectionViewController {
     // MARK: - API
     
     func fetchPosts() {
+        guard post == nil else { return }
+        
         PostService.fetchPosts { posts in
             self.posts = posts
             self.collectionView.refreshControl?.endRefreshing()
@@ -59,8 +63,9 @@ class FeedController: UICollectionViewController {
         // Register cell in collection view
         collectionView.register(FeedCell.self, forCellWithReuseIdentifier: reuseIdentifier)
         
-        // Temp logout button
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
+        if post == nil {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
+        }
         
         navigationItem.title = "Feed"
         
@@ -75,13 +80,19 @@ class FeedController: UICollectionViewController {
 extension FeedController {
     /// Tells collection view how many cells to create
     override func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
-        return posts.count
+        return post == nil ? posts.count : 1
     }
 
     /// Tells collection view how to create each cell
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! FeedCell
-        cell.viewModel = PostViewModel(post: posts[indexPath.row])
+        
+        if let post = post {
+            cell.viewModel = PostViewModel(post: post)
+        } else{
+            cell.viewModel = PostViewModel(post: posts[indexPath.row])
+        }
+        
         return cell
     }
 }
