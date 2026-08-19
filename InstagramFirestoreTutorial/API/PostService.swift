@@ -93,17 +93,45 @@ struct PostService {
         }
     }
     
+//    static func fetchFeedPosts(completion: @escaping([Post]) -> Void) {
+//        guard let uid = Auth.auth().currentUser?.uid else { return }
+//        var posts = [Post]()
+//        
+//        COLLECTION_USERS.document(uid).collection("user-feed").getDocuments { (snapshot, _) in
+//            snapshot?.documents.forEach({ document in
+//                fetchPost(withPostId: document.documentID) { post in
+//                    posts.append(post)
+//                    completion(posts)
+//                }
+//            })
+//        }
+//    }
+    
     static func fetchFeedPosts(completion: @escaping([Post]) -> Void) {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
+        guard let uid = Auth.auth().currentUser?.uid else {
+            completion([])
+            return
+        }
+
         var posts = [Post]()
-        
-        COLLECTION_USERS.document(uid).collection("user-feed").getDocuments { (snapshot, _) in
-            snapshot?.documents.forEach({ document in
+
+        COLLECTION_USERS.document(uid).collection("user-feed").getDocuments { snapshot, _ in
+            guard let documents = snapshot?.documents else {
+                completion([])
+                return
+            }
+
+            guard !documents.isEmpty else {
+                completion([])
+                return
+            }
+
+            documents.forEach { document in
                 fetchPost(withPostId: document.documentID) { post in
                     posts.append(post)
                     completion(posts)
                 }
-            })
+            }
         }
     }
     
