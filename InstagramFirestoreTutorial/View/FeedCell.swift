@@ -53,7 +53,6 @@ class FeedCell: UICollectionViewCell {
         iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
         iv.isUserInteractionEnabled = true
-        iv.image = UIImage(named: "venom-7")
         return iv
     }()
     
@@ -88,14 +87,12 @@ class FeedCell: UICollectionViewCell {
     
     private let captionLabel: UILabel = {
         let label = UILabel()
-        label.text = "Some test caption for now..."
         label.font = UIFont.systemFont(ofSize: 14)
         return label
     }()
     
     private let postTimeLabel: UILabel = {
         let label = UILabel()
-        label.text = "2 days ago"
         label.font = UIFont.systemFont(ofSize: 12)
         label.textColor = .lightGray
         return label
@@ -173,6 +170,8 @@ class FeedCell: UICollectionViewCell {
         likesLabel.text = viewModel.likesLabelText
         likeButton.tintColor = viewModel.likeButtonTintColor
         likeButton.setImage(viewModel.likeButtonImage, for: .normal)
+        
+        postTimeLabel.text = viewModel.timestampString
     }
     
     func configureActionButtons() {
